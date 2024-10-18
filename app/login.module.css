@@ -29,7 +29,7 @@ body {
 
 .image {
     flex: 0 0 60%; 
-    background-image: url("../../assets/login.png"); 
+    background-image: url("../assets/login.png"); 
     background-size: cover; 
     background-repeat: no-repeat; 
     background-position: center;
