@@ -1,6 +1,6 @@
 "use client";
 import styles from "./dashboard.module.css";
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import "@fontsource/poppins"; 
 import logo from "../../assets/Router.png";
 import dash from "../../assets/dash.png";
@@ -13,7 +13,7 @@ import Charts from "../../components/dashboard/dashboardDetails"
 const Dashboard = () => {
     const [activeItem, setActiveItem] = useState('');
 
-    const handleItemClick = (item) => {
+    const handleItemClick = (item: SetStateAction<string>) => {
         setActiveItem(item);
     };
 
