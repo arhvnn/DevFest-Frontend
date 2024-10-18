@@ -1,0 +1,187 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    height: 100vh;
+    width: 100vw;
+    background-color: #1F2D3D; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flexDiv {
+    display: flex;
+    flex-direction: row;
+    height: 82%;
+    width: 60%; 
+    border-radius: 25px;
+    overflow: hidden; 
+    background: rgba(45, 145, 156, 0.42);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(8.6px);
+    -webkit-backdrop-filter: blur(8.6px);
+    border: 1px solid rgba(45, 145, 156, 1);
+}
+
+.image {
+    flex: 0 0 60%; 
+    background-image: url("../../assets/login.png"); 
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center;
+    height: 100%; 
+}
+
+.login {
+    flex: 0 0 40%; 
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    background-color: #f9f9f9; 
+}
+
+.loginform {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.texts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+}
+
+.title {
+    font-family: "Poppins";
+}
+
+.subtitle {
+    color: #595959;
+    font-size: 14px;
+    font-family: "Poppins";
+    margin-top: -0.5vh;
+}
+
+.username {
+    border: none;
+    border-bottom: 2px solid #9B9B9B;
+    outline: none;
+    background-color: #f9f9f9;
+    margin-bottom: 3vh;
+    padding: 10px 2%;
+    width: 17vw;
+    height: 3vh;
+    font-size: 17px;
+    font-family: "Poppins";
+}
+
+.password {
+    margin-left: -1%;
+}
+
+.username:focus {
+    border-bottom: 2px solid blue;
+}
+
+.passwordContainer {
+    position: relative;
+    width: 17vw;
+}
+
+.password:focus {
+    border-bottom: 2px solid blue;
+}
+
+.eyeButton {
+    position: absolute;
+    right: 0vw;
+    top: 38%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    height: 40px;
+}
+
+.forgotPasswordContainer {
+    display: flex;
+    justify-content: flex-end; 
+    width: 100%; 
+    margin-top: -10px; 
+}
+
+.Forgotpassword {
+    font-size: 16px;
+    font-weight: 400;
+    color: #626262;
+    cursor: pointer;
+    margin-top: 1vh;
+    margin-bottom: 10vh;
+    font-family: "Poppins";
+}
+
+.submitbtn {
+    background-color: #2C3E50;
+    color: #FFFAFA;
+    border-radius: 95px;
+    width: 17vw;
+    height: 6vh;
+    font-size: 24px;
+    border: none; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+    box-shadow: none; 
+    font-family: "Poppins";
+}
+
+.submitbtn:active {
+    background-color: #2C3E50; 
+}
+
+.submitbtn:hover {
+    background-color: #1d2935;
+}
+
+.rememberMeContainer {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-end; 
+    width: 100%;
+    margin-top: 1rem; 
+    margin-left: 1vw;
+    margin-top: 2vh;
+    font-family: "Poppins";
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    cursor: pointer; 
+}
+
+.checkboxInput {
+    display: none; 
+}
+
+.customCheckbox {
+    width: 16px; 
+    height: 16px; 
+    border: 2px solid #626262; 
+    border-radius: 4px; 
+    margin-right: 8px; 
+    transition: background-color 0.3s, border-color 0.3s; 
+}
+
+.checkboxInput:checked + .customCheckbox {
+    background-color: #2C3E50;
+    border-color: #2C3E50; 
+}
