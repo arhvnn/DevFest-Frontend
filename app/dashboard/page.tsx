@@ -9,7 +9,8 @@ import control from "../../assets/control.png";
 import avatar from "../../assets/avatar.png";
 import Image from 'next/image'; 
 import Charts from "../../components/dashboard/dashboardDetails"
-
+import Topology from "../../components/NetworkTopology/NetworkTopology"
+import NetworkTopology from "../../components/NetworkTopology/NetworkTopology";
 const Dashboard = () => {
     const [activeItem, setActiveItem] = useState('');
 
@@ -18,6 +19,7 @@ const Dashboard = () => {
     };
 
     return (
+        
         <div className={styles.container}>
             <div className={styles.DashContainer}>
                 <div className={styles.sideBar}>
@@ -62,7 +64,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className={styles.mainContent}>
-                    <Charts ></Charts>
+                    <NetworkTopology></NetworkTopology>
                 </div>
             </div>
         </div>
