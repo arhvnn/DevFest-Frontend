@@ -54,8 +54,6 @@ const Login = () => {
                             <h1 className={styles.Forgotpassword}>Forgot password?</h1>
                         </div>
 
-                        <button className={styles.submitbtn} type='submit'>Log in</button>
-
                         <div className={styles.rememberMeContainer}>
                             <label className={styles.checkboxLabel}>
                                 <input 
@@ -68,6 +66,10 @@ const Login = () => {
                                 Remember Me
                             </label>
                         </div>
+
+                        <button className={styles.submitbtn} type='submit'>Log in</button>
+
+                        
                     </form>
                 </div>
             </div>
