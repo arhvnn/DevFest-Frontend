@@ -2,18 +2,28 @@ import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "./theme";
 
-const BarChart = ({ isDashboard = false }) => {
+const BarChart = ({ clients, bandwidthData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Mock Data
-  const data = [
-    { clientId: "Client 1", allocated: 10, used: 8 },
-    { clientId: "Client 2", allocated: 15, used: 10 },
-    { clientId: "Client 3", allocated: 5, used: 4 },
-    { clientId: "Client 4", allocated: 12, used: 9 },
-    { clientId: "Client 5", allocated: 8, used: 6 }
-  ];
+  // Map clients and bandwidthData
+  const data = clients.map(client => {
+    const clientBandwidthData = bandwidthData.filter(
+      b => b.client_id === client.id
+    );
+
+    const requestFrequency = clientBandwidthData.length;
+    const totalUsed = clientBandwidthData.reduce(
+      (acc, b) => acc + (parseFloat(b.allocated_bandwidth) || 0), // Ensure valid number
+      0
+    );
+
+    return {
+      clientId: client.client_name,
+      requests: requestFrequency || 0, // Ensure non-negative value
+      used: totalUsed / 1000 || 0, // Convert to Mbps
+    };
+  });
 
   return (
     <ResponsiveBar
@@ -47,13 +57,13 @@ const BarChart = ({ isDashboard = false }) => {
           },
         },
       }}
-      keys={["allocated", "used"]} // Updated to use "allocated" and "used" from mock data
-      indexBy="clientId" // Updated to index by "clientId"
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      keys={["requests", "used"]}
+      indexBy="clientId"
+      margin={{ top: 50, right: 130, bottom: 50, left: 75 }}
       padding={0.3}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "nivo" }} // Default color scheme
+      colors={{ scheme: "nivo" }}
       defs={[
         {
           id: "dots",
@@ -84,7 +94,7 @@ const BarChart = ({ isDashboard = false }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "Client ID", // Updated to "Client ID"
+        legend: "Client ID",
         legendPosition: "middle",
         legendOffset: 32,
       }}
@@ -92,10 +102,18 @@ const BarChart = ({ isDashboard = false }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "Bandwidth (Mbps)", // Updated to "Bandwidth"
-        legendPosition: "middle",
-        legendOffset: -40,
+        legend: "Requests / Bandwidth (Mbps)",
+        legendPosition: "middle", // Center the legend on the axis
+        legendOffset: -55, // Use a negative value to move the title closer to the Y-axis
+        tick: ({ x, y, formattedValue }) => (
+          <text x={x} y={y} dy={-10} textAnchor="middle" fill={colors.grey[100]}>
+            {formattedValue}
+          </text>
+        ),
       }}
+      
+      
+      
       enableLabel={false}
       labelSkipWidth={12}
       labelSkipHeight={12}
@@ -129,7 +147,7 @@ const BarChart = ({ isDashboard = false }) => {
       ]}
       role="application"
       barAriaLabel={function (e) {
-        return `${e.id}: ${e.formattedValue} Mbps for ${e.indexValue}`;
+        return `${e.id}: ${e.formattedValue} for ${e.indexValue}`;
       }}
     />
   );

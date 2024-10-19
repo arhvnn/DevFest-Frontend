@@ -3,6 +3,8 @@ import { useTheme } from "@mui/material";
 import { tokens } from "./theme";
 
 const LineChart = ({ clients, clientsData, bandwidthData, isDashboard = false }) => {
+  console.log(clientsData)
+  console.log(bandwidthData)
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 

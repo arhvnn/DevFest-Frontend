@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
           </section>
 
           <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400], padding: "30px" }}>
-            <Typography variant="h5" fontWeight="600">Pie Chart</Typography>
+            <Typography variant="h5" fontWeight="600">Allocated Bandwidth by Client</Typography>
             <div style={{ height: "200px", marginTop: "25px" }}>
               <PieChart
                 clients={clientsData} 
@@ -133,12 +133,10 @@ const Dashboard: React.FC = () => {
           </section>
 
           <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400] }}>
-            <Typography variant="h5" fontWeight="600" sx={{ padding: "30px 30px 0 30px" }}>Bar Chart</Typography>
+            <Typography style={{fontSize : "19px"}} variant="h5" fontWeight="600" sx={{ padding: "30px 30px 0 30px" }}>Used against allocated bandwidth per client</Typography>
             <div style={{ height: "250px", marginTop: "-20px" }}>
-              <BarChart clients={userNames} 
-                clientsData={clientsData} 
-                bandwidthData={bandwidthData} 
-                isDashboard={true}  isDashboard={true} />
+              <BarChart clients={clientsData} 
+                bandwidthData={bandwidthData}  />
             </div>
           </section>
         </div>

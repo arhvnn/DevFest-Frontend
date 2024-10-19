@@ -30,12 +30,13 @@ body {
 .table_headers {
     display: flex;
     flex-direction: row;
-    gap: 100px;
+    gap: 150px;
     justify-content: flex-start;
     margin-left: 15px;
     align-items: center;
     font-size: 20px;
     padding: 30px
+    
 }
 .line {
     width: 100%;
@@ -45,11 +46,14 @@ body {
 
 
 .user_row {
-    display: flex;
-    align-items: center; 
-    padding: 10px 0; 
-    border-bottom: 1px solid #e0e0e0; 
-  }
+  display: flex;
+  align-items: center; 
+  flex-direction: row;
+  border-bottom: 1px solid #e0e0e0; 
+  padding: 10px 0px ;
+  margin-left: 10px;
+  
+}
   
   
   .user_row > div:first-child {
@@ -92,3 +96,60 @@ body {
     background-color: #f9f9f9; 
   }
   
+
+
+
+  .table_headers, .user_row {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px; /* Add padding to headers and rows */
+    text-align: left;   /* Align text to the left */
+}
+
+.table_headers div, .user_row > div {
+    flex: 1;           /* Equal flex for all columns */
+    text-align: left;   /* Align text in the rows */
+}
+
+/* Reduce gap size */
+.table_headers {
+    gap: 0px;       
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.user_row {
+    border-bottom: 1px solid #e0e0e0;
+    gap: 20px;         /* Smaller gap for row content */
+}
+
+.device_icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px; /* Adjust spacing */
+}
+
+/* Ensure block icon is positioned properly */
+.block_icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+/* Improve responsiveness by reducing width */
+.limit_input {
+    width: 80px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.limit {
+  margin-left: 50px;
+}
+
+.Actual {
+  margin-left: 5px;
+}
