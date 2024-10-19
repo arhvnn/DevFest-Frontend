@@ -34,27 +34,26 @@ const Login = () => {
         event.preventDefault(); 
     
         try {
-            const response = await axios.post('http://localhost:3001/login', {
+            const response = await axios.post('http://localhost:3002/login', {
                 username,
                 password,
-            });
-    
-            if (response.status === 200) {
-                const token = response.data.token; 
-                localStorage.setItem('authToken', token); 
-                console.log('Login success'); 
-                router.push('/dashboard'); 
+                rememberMe
+            }, { withCredentials: true }); // Ensure cookies are sent/received
+            
+            if (response.status === 200 && response.data.token) {
+                const token = response.data.token; // Get the token from the response
+                localStorage.setItem('authToken', token); // Store the token in localStorage
+                console.log('Login success');
+                router.push('/dashboard'); // Redirect to the dashboard upon successful login
             } else {
-                console.log('Not success'); 
+                setError('Invalid credentials');
             }
         } catch (error) {
             setError('Invalid username or password');
             console.error('Login error:', error);
-            console.log('Not success');
         }
     };
     
-
     return (
         <div className={styles.container}>
             <div className={styles.flexDiv}>
