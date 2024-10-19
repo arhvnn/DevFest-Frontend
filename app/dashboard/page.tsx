@@ -64,7 +64,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className={styles.mainContent}>
-                    <NetworkTopology></NetworkTopology>
+                    <Charts></Charts>
                 </div>
             </div>
         </div>

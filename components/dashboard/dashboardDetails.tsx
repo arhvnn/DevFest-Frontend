@@ -1,53 +1,226 @@
-"use client";
-import Image from 'next/image';
-import eyeIcon from '../assets/eye.png'; 
-import styles from "./dashboard.module.css";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import "@fontsource/poppins";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Button, IconButton, Typography, useTheme } from "@mui/material";
+import { tokens } from "./theme";
+import { mockTransactions } from "./data/mockData";
+import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import EmailIcon from "@mui/icons-material/Email";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import TrafficIcon from "@mui/icons-material/Traffic";
+import BarChart from "./BarChart";
+import LineChart from "./LineChart";
+import StatBox from "./StatBox";
+import PieChart from "./PieChart";
 
-const data = [
-  { name: 'Jan', value: 400, barValue: 240 },
-  { name: 'Feb', value: 300, barValue: 139 },
-  { name: 'Mar', value: 500, barValue: 980 },
-  { name: 'Apr', value: 600, barValue: 390 },
-  { name: 'May', value: 700, barValue: 480 },
-  { name: 'Jun', value: 800, barValue: 380 },
-];
+const Dashboard = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
-const DashDetails = () => {
-    return (
-        <>
-            <div className={styles.container}>
-                <h2>Monti charts hna yaa bensabra</h2>
+  return (
+    <div style={{ margin: "20px" }}>
+      {/* HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* You can add a header here if needed */}
+      </div>
 
-                {/* Line Chart */}
-                <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="value" stroke="#8884d8" activeDot={{ r: 8 }} />
-                    </LineChart>
-                </ResponsiveContainer>
+      {/* GRID & CHARTS */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(12, 1fr)",
+          gridAutoRows: "140px",
+          gap: "20px",
+        }}
+      >
+        {/* ROW 1 */}
+        <div
+          style={{
+            gridColumn: "span 3",
+            backgroundColor: colors.primary[400],
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <StatBox
+            title="12,361"
+            subtitle="Emails Sent"
+            progress="0.75"
+            increase="+14%"
+            icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+          />
+        </div>
+        <div
+          style={{
+            gridColumn: "span 3",
+            backgroundColor: colors.primary[400],
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <StatBox
+            title="431,225"
+            subtitle="Sales Obtained"
+            progress="0.50"
+            increase="+21%"
+            icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+          />
+        </div>
+        <div
+          style={{
+            gridColumn: "span 3",
+            backgroundColor: colors.primary[400],
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <StatBox
+            title="32,441"
+            subtitle="New Clients"
+            progress="0.30"
+            increase="+5%"
+            icon={<PersonAddIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+          />
+        </div>
+        <div
+          style={{
+            gridColumn: "span 3",
+            backgroundColor: colors.primary[400],
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <StatBox
+            title="1,325,134"
+            subtitle="Traffic Received"
+            progress="0.80"
+            increase="+43%"
+            icon={<TrafficIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />}
+          />
+        </div>
 
-                {/* Bar Chart */}
-                <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="barValue" fill="#82ca9d" />
-                    </BarChart>
-                </ResponsiveContainer>
+        {/* ROW 2 */}
+        <div
+          style={{
+            gridColumn: "span 8",
+            gridRow: "span 2",
+            backgroundColor: colors.primary[400],
+          }}
+        >
+          <div
+            style={{
+              marginTop: "25px",
+              padding: "0 30px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+                Total
+              </Typography>
+              <Typography variant="h3" fontWeight="bold" color={colors.greenAccent[500]}>
+                59342
+              </Typography>
             </div>
-        </>
-    );
-}
+          </div>
+          <div style={{ height: "250px", margin: "-20px 0 0 0" }}>
+            <LineChart isDashboard={true} />
+          </div>
+        </div>
+        <div
+          style={{
+            gridColumn: "span 4",
+            gridRow: "span 4",
+            backgroundColor: colors.primary[400],
+            overflow: "auto",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottom: `4px solid ${colors.primary[500]}`,
+              colors: colors.grey[100],
+              padding: "15px",
+            }}
+          >
+            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+              Recent
+            </Typography>
+          </div>
+          {mockTransactions.map((transaction, i) => (
+            <div
+              key={`${transaction.txId}-${i}`}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottom: `4px solid ${colors.primary[500]}`,
+                padding: "15px",
+              }}
+            >
+              <div>
+                <Typography color={colors.greenAccent[500]} variant="h5" fontWeight="600">
+                  {transaction.txId}
+                </Typography>
+                <Typography color={colors.grey[100]}>{transaction.user}</Typography>
+              </div>
+              <div style={{ color: colors.grey[100] }}>{transaction.date}</div>
+              <div
+                style={{
+                  backgroundColor: colors.greenAccent[500],
+                  padding: "5px 10px",
+                  borderRadius: "4px",
+                }}
+              >
+                ${transaction.cost}
+              </div>
+            </div>
+          ))}
+        </div>
 
-export default DashDetails;
+        {/* ROW 3 */}
+        <div
+          style={{
+            gridColumn: "span 4",
+            gridRow: "span 2",
+            backgroundColor: colors.primary[400],
+            padding: "30px",
+          }}
+        >
+          <Typography variant="h5" fontWeight="600">
+            Pie Chart
+          </Typography>
+          <div style={{ height: "200px", marginTop: "25px" }}>
+            <PieChart isDashboard={true} />
+          </div>
+        </div>
+        <div
+          style={{
+            gridColumn: "span 4",
+            gridRow: "span 2",
+            backgroundColor: colors.primary[400],
+          }}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            sx={{ padding: "30px 30px 0 30px" }}
+          >
+            BarChart
+          </Typography>
+          <div style={{ height: "250px", marginTop: "-20px" }}>
+            <BarChart isDashboard={true} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

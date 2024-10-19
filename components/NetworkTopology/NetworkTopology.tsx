@@ -2,131 +2,84 @@
 import styles from "./NetworkTopology.module.css";
 import React, { useEffect, useRef } from "react";
 import { Network } from "vis-network/standalone/esm/vis-network";
-import routerImage from "../../assets/modem.png";
 import pcImage from "../../assets/pc.png";
 import mobileImage from "../../assets/mobile.png";
+import axios from 'axios';
 
 const NetworkTopology = () => {
   const networkRef = useRef(null);
 
   useEffect(() => {
-    if (networkRef.current) {
-      const nodes = [
-        {
-          id: 1,
-          label: "Router",
-          shape: "image",
-          image: routerImage.src, // Use .src to get the URL string
-          brokenImage: routerImage.src, // Fallback image as URL string
-          size: 60, // Larger size for router
-        },
-        {
-          id: 2,
-          label: "John (PC)",
-          shape: "image",
-          image: pcImage.src, // Use .src to get the URL string
-          brokenImage: pcImage.src, // Fallback image as URL string
-          size: 30, // Default size for PC
-        },
-        {
-          id: 3,
-          label: "Jane (Mobile)",
-          shape: "image",
-          image: mobileImage.src, // Use .src to get the URL string
-          brokenImage: mobileImage.src, // Fallback image as URL string
-          size: 20, // Default size for Mobile
-        },
-        {
-          id: 4,
-          label: "Bob (PC)",
-          shape: "image",
-          image: pcImage.src, // Use .src to get the URL string
-          brokenImage: pcImage.src, // Fallback image as URL string
-          size: 30,
-        },
-        {
-          id: 5,
-          label: "Router",
-          shape: "image",
-          image: routerImage.src, // Use .src to get the URL string
-          brokenImage: routerImage.src, // Fallback image as URL string
-          size: 60,
-        },
-        {
-          id: 7,
-          label: "John (PC)",
-          shape: "image",
-          image: pcImage.src, // Use .src to get the URL string
-          brokenImage: pcImage.src, // Fallback image as URL string
-          size: 30,
-        },
-        {
-          id: 8,
-          label: "Jane (Mobile)",
-          shape: "image",
-          image: mobileImage.src, // Use .src to get the URL string
-          brokenImage: mobileImage.src, // Fallback image as URL string
-          size: 20,
-        },
-        {
-          id: 9,
-          label: "Bob (PC)",
-          shape: "image",
-          image: pcImage.src, // Use .src to get the URL string
-          brokenImage: pcImage.src, // Fallback image as URL string
-          size: 30,
-        },
-        {
-          id: 10,
-          label: "Alice (Mobile)",
-          shape: "image",
-          image: mobileImage.src, // Use .src to get the URL string
-          brokenImage: mobileImage.src, // Fallback image as URL string
-          size: 20,
-        },
-      ];
+    const fetchClients = async () => {
+      try {
+        // Fetching clients from the server
+        const response = await axios.get('http://localhost:3001/clients');
+        const clients = response.data; // Assuming the API response returns an array of client objects
 
-      const edges = [
-        { from: 1, to: 2 },
-        { from: 1, to: 3 },
-        { from: 1, to: 4 },
-        { from: 1, to: 5 },
-      ];
+        console.log("Clients fetched:", clients); // Log the clients data for debugging
 
-      const data = { nodes, edges };
-      const options = {
-        nodes: {
-          shape: 'image',
-          size: 20, // General size for other nodes if not specified
-        },
-        edges: {
-          smooth: {
-            enabled: true, // Enable smooth edges
-            type: 'continuous', // Type of smoothing
-            roundness: 0.5, // Degree of roundness (0 to 1)
+        // Check if the response is an array
+        if (!Array.isArray(clients)) {
+          throw new Error("Expected clients to be an array");
+        }
+
+        // Map the clients to nodes for visualization
+        const nodes = clients.map((client, index) => ({
+          id: index + 1, // Unique ID for each node
+          label: `${client.client_name} (${client.device_type})`, // Label for the node
+          shape: "image",
+          image: client.device_type === 'PC' ? pcImage.src : mobileImage.src, // Choose image based on device type
+          brokenImage: client.device_type === 'PC' ? pcImage.src : mobileImage.src, // Fallback image
+          size: client.device_type === 'PC' ? 30 : 20, // Set size based on device type
+        }));
+
+        // Example edges (customize as needed)
+        const edges = [
+          { from: 1, to: 2 },
+          { from: 1, to: 3 },
+          { from: 1, to: 4 },
+          { from: 1, to: 5 },
+        ];
+
+        const data = { nodes, edges };
+        const options = {
+          nodes: {
+            shape: 'image',
+            size: 20, // Default size for nodes
           },
-          width: 2,
-        },
-        layout: {
-          improvedLayout: false, // Disable improved layout for more control over spacing
-        },
-        physics: {
-          enabled: true,
-          solver: 'repulsion', // Use repulsion force to spread nodes apart
-          repulsion: {
-            nodeDistance: 100, // Reduce this value to bring nodes closer
+          edges: {
+            smooth: {
+              enabled: true, // Enable smooth edges
+              type: 'continuous', // Type of smoothing
+              roundness: 0.5, // Degree of roundness (0 to 1)
+            },
+            width: 2,
           },
-        },
-      };
-      
+          layout: {
+            improvedLayout: false, // Disable improved layout for manual control
+          },
+          physics: {
+            enabled: true,
+            solver: 'repulsion', // Use repulsion force to spread nodes apart
+            repulsion: {
+              nodeDistance: 100, // Distance between nodes
+            },
+          },
+        };
 
-      // Create the network visualization
-      const network = new Network(networkRef.current, data, options);
+        // Create the network visualization
+        if (networkRef.current) {
+          const network = new Network(networkRef.current, data, options);
+          return () => {
+            network.destroy(); // Clean up on component unmount
+          };
+        }
+      } catch (error) {
+        console.error("Error fetching client data:", error);
+      }
+    };
 
-      return () => {
-        network.destroy(); // Clean up
-      };
-    }
+    fetchClients(); // Call the fetch function
   }, []);
 
   return (
