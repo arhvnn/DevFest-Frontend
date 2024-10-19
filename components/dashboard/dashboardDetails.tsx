@@ -10,12 +10,15 @@ import BarChart from "./BarChart";
 import LineChart from "./LineChart";
 import StatBox from "./StatBox";
 import PieChart from "./PieChart";
+import styles from "./dashboard.module.css"
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   return (
+    <div className={styles.container}>
+
     <div style={{ margin: "20px" }}>
       {/* HEADER */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -219,6 +222,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

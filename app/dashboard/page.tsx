@@ -8,18 +8,17 @@ import network from "../../assets/network.png";
 import control from "../../assets/control.png";
 import avatar from "../../assets/avatar.png";
 import Image from 'next/image'; 
-import Charts from "../../components/dashboard/dashboardDetails"
-import Topology from "../../components/NetworkTopology/NetworkTopology"
+import Charts from "../../components/dashboard/dashboardDetails";
 import NetworkTopology from "../../components/NetworkTopology/NetworkTopology";
+
 const Dashboard = () => {
-    const [activeItem, setActiveItem] = useState('');
+    const [activeItem, setActiveItem] = useState('dashboard');
 
     const handleItemClick = (item: SetStateAction<string>) => {
         setActiveItem(item);
     };
 
     return (
-        
         <div className={styles.container}>
             <div className={styles.DashContainer}>
                 <div className={styles.sideBar}>
@@ -64,7 +63,9 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className={styles.mainContent}>
-                    <Charts></Charts>
+                    {activeItem === 'dashboard' && <Charts />}
+                    {activeItem === 'network' && <NetworkTopology />}
+                    {activeItem === '' && <div>Select an option from the sidebar</div>} {/* Optional message when no item is selected */}
                 </div>
             </div>
         </div>
