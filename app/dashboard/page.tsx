@@ -10,7 +10,7 @@ import avatar from "../../assets/avatar.png";
 import Image from 'next/image'; 
 import Charts from "../../components/dashboard/dashboardDetails";
 import NetworkTopology from "../../components/NetworkTopology/NetworkTopology";
-
+import ControlPanel from "../../components/control/ControlPanel"
 const Dashboard = () => {
     const [activeItem, setActiveItem] = useState('dashboard');
 
@@ -65,6 +65,7 @@ const Dashboard = () => {
                 <div className={styles.mainContent}>
                     {activeItem === 'dashboard' && <Charts />}
                     {activeItem === 'network' && <NetworkTopology />}
+                    {activeItem === 'control' && <ControlPanel/>}
                     {activeItem === '' && <div>Select an option from the sidebar</div>} {/* Optional message when no item is selected */}
                 </div>
             </div>
