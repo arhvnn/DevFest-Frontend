@@ -10,22 +10,26 @@ import React, { useEffect, useState } from "react";
 const Dashboard: React.FC = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  
+
   const [bandwidthData, setBandwidthData] = useState<any[]>([]);
   const [clientsData, setClientsData] = useState<any[]>([]);
-  const [totalBandwidth, setTotalBandwidth] = useState<number>(0);
+  // const [totalBandwidthKbps, setTotalBandwidthKbps] = useState<number>(0);
+  // const [totalBandwidthMbps, setTotalBandwidthMbps] = useState<number>(0);
 
   const fetchData = async () => {
     try {
-      const bandwidthResponse = await axios.get('http://localhost:3002/bandwidth', {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const [bandwidthResponse, clientsResponse] = await Promise.all([
+        axios.get('http://localhost:3002/bandwidth', {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        axios.get('http://localhost:3002/clients', {
+          headers: { 'Content-Type': 'application/json' },
+        })
+      ]);
+
       console.log("Bandwidth Response:", bandwidthResponse.data);
       setBandwidthData(bandwidthResponse.data);
 
-      const clientsResponse = await axios.get('http://localhost:3002/clients', {
-          headers: { 'Content-Type': 'application/json' },
-      });
       console.log("Clients Response:", clientsResponse.data);
       setClientsData(clientsResponse.data);
     } catch (error) {
@@ -35,33 +39,39 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchData(); // Initial data fetch
-    const intervalId = setInterval(() => {
-      fetchData(); // Fetch data every 5 seconds
-    }, 5000);
+    const intervalId = setInterval(fetchData, 1000); // Fetch data every second
 
     return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
 
+  // Stop calculating total bandwidth for now
+  /*
   useEffect(() => {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).getTime(); // Get the timestamp for one hour ago
-    const filteredData = bandwidthData.filter(item => new Date(item.timestamp).getTime() >= oneHourAgo);
-    
-    const total = filteredData.reduce((acc, curr) => acc + curr.requested_bandwidth, 0);
-    setTotalBandwidth(total);
-    console.log("Total Bandwidth in the last hour:", total);
+    const totalKbps = bandwidthData.reduce((acc, curr) => {
+      return acc + parseFloat(curr.allocated_bandwidth || 0); // Handle potential undefined
+    }, 0);
+    setTotalBandwidthKbps(totalKbps);
+    setTotalBandwidthMbps(totalKbps / 1000); // Convert to Mbps
+
+    console.log("Total Allocated Bandwidth (kbps):", totalKbps);
+    console.log("Total Allocated Bandwidth (Mbps):", totalKbps / 1000);
   }, [bandwidthData]);
+  */
+
+  // Extract user names for line chart
+  const userNames = clientsData.map(client => client.client_name);
 
   return (
     <div className={styles.container}>
       <div style={{ margin: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", flexDirection: "column", marginBottom: "4vh" }}>
-          <Typography style={{ marginBottom: "1" }} variant="h4" fontWeight="900" color={colors.grey[100]}>
+        <header style={{ marginBottom: "4vh" }}>
+          <Typography variant="h4" fontWeight="900" color={colors.grey[100]}>
             Dashboard
           </Typography>
           <Typography style={{ color: "#00A5E0", fontSize: "16px", fontWeight: "700", fontFamily: "Poppins" }}>
             Welcome to your dashboard
           </Typography>
-        </div>
+        </header>
 
         <div
           style={{
@@ -71,69 +81,31 @@ const Dashboard: React.FC = () => {
             gap: "20px",
           }}
         >
-          <div
-            style={{
-              gridColumn: "span 8",
-              gridRow: "span 2",
-              backgroundColor: colors.primary[400],
-            }}
-          >
-            <div
-              style={{
-                height: "50px",
-                marginTop: "25px",
-                padding: "0 30px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+          <section style={{ gridColumn: "span 8", gridRow: "span 2", backgroundColor: colors.primary[400] }}>
+            <header style={{ height: "50px", marginTop: "25px", padding: "0 30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
-                  Total Bandwidth
+                  Total Allocated Bandwidth
                 </Typography>
-                <Typography variant="h3" fontWeight="bold" color={colors.greenAccent[500]}>
-                  {totalBandwidth} {/* Display total requested bandwidth */}
-                </Typography>
+                {/* Temporarily remove the bandwidth display */}
+                {/* <Typography variant="h3" fontWeight="bold" color={colors.greenAccent[500]}>
+                  {totalBandwidthMbps.toFixed(2)} Mbps
+                </Typography> */}
               </div>
-            </div>
+            </header>
             <div style={{ height: "270px", margin: "-20px 0 0 0" }}>
-              <LineChart data={bandwidthData} isDashboard={true} />
+              <LineChart data={bandwidthData} labels={userNames} isDashboard={true} />
             </div>
-          </div>
+          </section>
 
-          <div
-            style={{
-              gridColumn: "span 4",
-              gridRow: "span 4",
-              backgroundColor: colors.primary[400],
-              overflow: "auto",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                borderBottom: `4px solid ${colors.primary[500]}`,
-                padding: "15px",
-              }}
-            >
+          <section style={{ gridColumn: "span 4", gridRow: "span 4", backgroundColor: colors.primary[400], overflow: "auto" }}>
+            <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `4px solid ${colors.primary[500]}`, padding: "15px" }}>
               <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
                 Recent Clients
               </Typography>
-            </div>
+            </header>
             {clientsData.map((client) => (
-              <div
-                key={client.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderBottom: `4px solid ${colors.primary[500]}`,
-                  padding: "15px",
-                }}
-              >
+              <div key={client.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `4px solid ${colors.primary[500]}`, padding: "15px" }}>
                 <div>
                   <Typography color={colors.greenAccent[500]} variant="h5" fontWeight="600">
                     {client.client_name}
@@ -145,42 +117,21 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </section>
 
-          <div
-            style={{
-              gridColumn: "span 4",
-              gridRow: "span 2",
-              backgroundColor: colors.primary[400],
-              padding: "30px",
-            }}
-          >
-            <Typography variant="h5" fontWeight="600">
-              Pie Chart
-            </Typography>
+          <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400], padding: "30px" }}>
+            <Typography variant="h5" fontWeight="600">Pie Chart</Typography>
             <div style={{ height: "200px", marginTop: "25px" }}>
               <PieChart data={bandwidthData} isDashboard={true} />
             </div>
-          </div>
-          
-          <div
-            style={{
-              gridColumn: "span 4",
-              gridRow: "span 2",
-              backgroundColor: colors.primary[400],
-            }}
-          >
-            <Typography
-              variant="h5"
-              fontWeight="600"
-              sx={{ padding: "30px 30px 0 30px" }}
-            >
-              BarChart
-            </Typography>
+          </section>
+
+          <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400] }}>
+            <Typography variant="h5" fontWeight="600" sx={{ padding: "30px 30px 0 30px" }}>Bar Chart</Typography>
             <div style={{ height: "250px", marginTop: "-20px" }}>
               <BarChart data={bandwidthData} isDashboard={true} />
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>
