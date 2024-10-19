@@ -5,7 +5,7 @@ import LineChart from "./LineChart";
 import PieChart from "./PieChart";
 import styles from "./dashboard.module.css";
 import axios from 'axios';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
@@ -13,8 +13,13 @@ const Dashboard: React.FC = () => {
 
   const [bandwidthData, setBandwidthData] = useState<any[]>([]);
   const [clientsData, setClientsData] = useState<any[]>([]);
-  // const [totalBandwidthKbps, setTotalBandwidthKbps] = useState<number>(0);
-  // const [totalBandwidthMbps, setTotalBandwidthMbps] = useState<number>(0);
+  const [totalBandwidthKbps, setTotalBandwidthKbps] = useState<number>(0);
+  const [totalBandwidthMbps, setTotalBandwidthMbps] = useState<number>(0);
+
+  // useRef to store the initial data for the LineChart
+  const initialClientsData = useRef<any[]>([]);
+  const initialUserNames = useRef<string[]>([]);
+  const isFirstRender = useRef(true); // To track the first render
 
   const fetchData = async () => {
     try {
@@ -29,32 +34,24 @@ const Dashboard: React.FC = () => {
 
       setBandwidthData(bandwidthResponse.data);
       setClientsData(clientsResponse.data);
+
+      // Store the initial data for the LineChart only once
+      if (isFirstRender.current) {
+        initialClientsData.current = clientsResponse.data;
+        initialUserNames.current = clientsResponse.data.map(client => client.client_name);
+        isFirstRender.current = false; // Mark that we've used the initial data
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  // Fetch data only once on component mount
   useEffect(() => {
     fetchData(); // Initial data fetch
-    // const intervalId = setInterval(fetchData, 1000); // Fetch data every second
+    const intervalId = setInterval(fetchData, 1000); // Fetch data every second
 
-    // return () => clearInterval(intervalId); // Clear the interval on component unmount
+    return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
-
-  // Stop calculating total bandwidth for now
-  /*
-  useEffect(() => {
-    const totalKbps = bandwidthData.reduce((acc, curr) => {
-      return acc + parseFloat(curr.allocated_bandwidth || 0); // Handle potential undefined
-    }, 0);
-    setTotalBandwidthKbps(totalKbps);
-    setTotalBandwidthMbps(totalKbps / 1000); // Convert to Mbps
-  }, [bandwidthData]);
-  */
-
-  // Extract user names for line chart
-  const userNames = clientsData.map(client => client.client_name);
 
   return (
     <div className={styles.container}>
@@ -76,32 +73,28 @@ const Dashboard: React.FC = () => {
             gap: "20px",
           }}
         >
-          <section style={{ gridColumn: "span 8", gridRow: "span 2", backgroundColor: colors.primary[400] }}>
+          <section style={{ gridColumn: "span 8", gridRow: "span 2", backgroundColor: colors.primary[400], borderRadius: "25px" }}>
             <header style={{ height: "50px", marginTop: "25px", padding: "0 30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+                <Typography style={{ marginTop: "13px" }} variant="h5" fontWeight="600" color={colors.grey[100]}>
                   Total Allocated Bandwidth
                 </Typography>
-                {/* Temporarily remove the bandwidth display */}
-                {/* <Typography variant="h3" fontWeight="bold" color={colors.greenAccent[500]}>
+                <Typography variant="h3" fontWeight="bold" color={colors.greenAccent[500]}>
                   {totalBandwidthMbps.toFixed(2)} Mbps
-                </Typography> */}
+                </Typography>
               </div>
             </header>
-            <div style={{ height: "270px", margin: "-20px 0 0 0" }}>
-              <LineChart 
-                clients={userNames} 
-                clientsData={clientsData} 
-                bandwidthclients={userNames} 
-                clientsData={clientsData} 
-                bandwidthData={bandwidthData} 
-                isDashboard={true}  
-                isDashboard={true} 
+            <div style={{ height: "270px", margin: "-20px 0 0 0", borderRadius: "25px" }}>
+              <LineChart
+                clients={initialUserNames}
+                clientsData={initialClientsData.current}
+                bandwidthData={bandwidthData}
+                isDashboard={true}
               />
             </div>
           </section>
 
-          <section style={{ gridColumn: "span 4", gridRow: "span 4", backgroundColor: colors.primary[400], overflow: "auto" }}>
+          <section style={{ gridColumn: "span 4", gridRow: "span 4", backgroundColor: colors.primary[400], overflow: "auto", borderRadius: "25px" }}>
             <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `4px solid ${colors.primary[500]}`, padding: "15px" }}>
               <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
                 Recent Clients
@@ -122,21 +115,22 @@ const Dashboard: React.FC = () => {
             ))}
           </section>
 
-          <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400], padding: "30px" }}>
+          <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400], padding: "30px", borderRadius: "25px" }}>
             <Typography variant="h5" fontWeight="600">Allocated Bandwidth by Client</Typography>
             <div style={{ height: "200px", marginTop: "25px" }}>
               <PieChart
-                clients={clientsData} 
-                bandwidthData={bandwidthData} 
-                 />
+                clients={clientsData}
+                bandwidthData={bandwidthData}
+              />
             </div>
           </section>
 
-          <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400] }}>
-            <Typography style={{fontSize : "19px"}} variant="h5" fontWeight="600" sx={{ padding: "30px 30px 0 30px" }}>Used against allocated bandwidth per client</Typography>
+          <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400], borderRadius: "25px" }}>
+            <Typography style={{ fontSize: "19px" }} variant="h5" fontWeight="600" sx={{ padding: "30px 30px 0 30px" }}>Used against allocated bandwidth per client</Typography>
             <div style={{ height: "250px", marginTop: "-20px" }}>
-              <BarChart clients={clientsData} 
-                bandwidthData={bandwidthData}  />
+              <BarChart clients={clientsData}
+                bandwidthData={bandwidthData}
+              />
             </div>
           </section>
         </div>

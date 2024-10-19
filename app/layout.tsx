@@ -1,4 +1,3 @@
-// app/layout.tsx
 
 import Login from "./page"
 export const metadata = {
@@ -11,6 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head />
       <body>{children}</body>
+
     </html>
   );
 }

@@ -1,76 +1,95 @@
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "./theme";
+import { useState, useEffect } from "react";
 
 const LineChart = ({ clients, clientsData, bandwidthData, isDashboard = false }) => {
-  console.log(clientsData)
-  console.log(bandwidthData)
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Current time and cut off time for 6 hours
+  // Store previous chart data to retain past points
+  const [previousData, setPreviousData] = useState({});
+
+  // Current time and cutoff time for 6 hours
   const now = new Date();
   const endHour = now.getHours();
   const startHour = (endHour - 6 + 24) % 24; // Hour 6 hours ago
 
-  // Prepare the data for the line chart
-  const data = clientsData.map((client, index) => {
-    // Filter bandwidth data for the current client within the last 6 hours
-    const clientBandwidthData = bandwidthData.filter(b => b.client_id === client.id)
-      .filter(b => new Date(b.timestamp) >= now.getTime() - 6 * 60 * 60 * 1000); // Last 6 hours
+  useEffect(() => {
+    // Prepare the data for the line chart
+    const updatedData = clientsData.map((client, index) => {
+      // Filter bandwidth data for the current client within the last 6 hours
+      const clientBandwidthData = bandwidthData
+        .filter(b => b.client_id === client.id)
+        .filter(b => new Date(b.timestamp) >= now.getTime() - 6 * 60 * 60 * 1000); // Last 6 hours
 
-    // Sort bandwidth data by timestamp
-    clientBandwidthData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      // Sort bandwidth data by timestamp
+      clientBandwidthData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-    // Aggregate data hourly
-    const hourlyData = {};
-    clientBandwidthData.forEach(point => {
-      const hourKey = new Date(point.timestamp).getHours();
-      if (!hourlyData[hourKey]) {
-        hourlyData[hourKey] = { count: 0, totalBandwidth: 0 };
-      }
-      hourlyData[hourKey].count += 1;
-      hourlyData[hourKey].totalBandwidth += parseFloat(point.requested_bandwidth); // in kbps
-    });
+      // Aggregate data hourly
+      const hourlyData = {};
+      clientBandwidthData.forEach(point => {
+        const hourKey = new Date(point.timestamp).getHours();
+        if (!hourlyData[hourKey]) {
+          hourlyData[hourKey] = { count: 0, totalBandwidth: 0 };
+        }
+        hourlyData[hourKey].count += 1;
+        hourlyData[hourKey].totalBandwidth += parseFloat(point.requested_bandwidth); // in kbps
+      });
 
-    // Calculate the average bandwidth for imputation
-    const totalCount = Object.values(hourlyData).reduce((sum, data) => sum + data.count, 0);
-    const totalBandwidth = Object.values(hourlyData).reduce((sum, data) => sum + data.totalBandwidth, 0);
-    const averageBandwidth = totalCount > 0 ? (totalBandwidth / totalCount / 1000) : 0; // in Mbps
+      // Calculate the average bandwidth for imputation
+      const totalCount = Object.values(hourlyData).reduce((sum, data) => sum + data.count, 0);
+      const totalBandwidth = Object.values(hourlyData).reduce((sum, data) => sum + data.totalBandwidth, 0);
+      const averageBandwidth = totalCount > 0 ? (totalBandwidth / totalCount / 1000) : 0; // in Mbps
 
-    // Create line data from hourly aggregated data
-    const lineData = Array.from({ length: 7 }, (_, i) => {
-      const hour = (startHour + i) % 24;
-      const hourlyPoint = hourlyData[hour];
+      // Get previous client data or initialize new
+      const previousClientData = previousData[client.id]?.data || [];
 
-      let bandwidthValue;
+      // Update only the most recent 6 hours of points
+      const lineData = [...previousClientData]; // Copy previous points
+      for (let i = 0; i < 7; i++) {
+        const hour = (startHour + i) % 24;
+        const hourlyPoint = hourlyData[hour];
 
-      if (hourlyPoint && hourlyPoint.count > 0) {
-        const averageForHour = (hourlyPoint.totalBandwidth / hourlyPoint.count / 1000); // Convert to Mbps
-        const randomVariation = (Math.random() * 0.5 - 0.25); // Random variation between -0.25 and 0.25
-        bandwidthValue = Math.max(0, parseFloat((averageForHour + randomVariation).toFixed(2))); // Ensure non-negative
-      } else {
-        // Impute using the average + a small random value
-        const randomVariation = (Math.random() * 0.5 - 0.25); // Random variation between -0.25 and 0.25
-        bandwidthValue = Math.max(0, parseFloat((averageBandwidth + randomVariation).toFixed(2))); // Ensure non-negative
+        let bandwidthValue;
+        if (hourlyPoint && hourlyPoint.count > 0) {
+          const averageForHour = (hourlyPoint.totalBandwidth / hourlyPoint.count / 1000); // Convert to Mbps
+          const randomVariation = (Math.random() * 0.5 - 0.25); // Random variation between -0.25 and 0.25
+          bandwidthValue = Math.max(0, parseFloat((averageForHour + randomVariation).toFixed(2))); // Ensure non-negative
+        } else {
+          // Impute using the average + a small random value
+          const randomVariation = (Math.random() * 0.5 - 0.25); // Random variation between -0.25 and 0.25
+          bandwidthValue = Math.max(0, parseFloat((averageBandwidth + randomVariation).toFixed(2))); // Ensure non-negative
+        }
+
+        // Update or add new points for the last 6 hours only
+        if (lineData.length <= i) {
+          lineData.push({ x: hour, y: bandwidthValue });
+        } else {
+          lineData[i] = { x: hour, y: bandwidthValue }; // Replace only the most recent 6 hours
+        }
       }
 
       return {
-        x: hour,
-        y: bandwidthValue,
+        id: client.client_name,
+        color: `hsl(${(index * 60) % 360}, 70%, 50%)`,
+        data: lineData,
       };
     });
 
-    return {
-      id: client.client_name,
-      color: `hsl(${(index * 60) % 360}, 70%, 50%)`,
-      data: lineData,
-    };
-  });
+    // Update the previous data with the newly computed points
+    setPreviousData((prev) => {
+      const newData = { ...prev }; // Copy the previous data to avoid replacing
+      updatedData.forEach((clientData) => {
+        newData[clientData.id] = clientData; // Update only the current client data
+      });
+      return newData;
+    });
+  }, [clientsData, bandwidthData]);
 
   return (
     <ResponsiveLine
-      data={data}
+      data={Object.values(previousData)}
       theme={{
         axis: {
           domain: {

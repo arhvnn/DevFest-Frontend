@@ -102,7 +102,7 @@ const BarChart = ({ clients, bandwidthData }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: "Requests / Bandwidth (Mbps)",
+        legend: "Requests / Bandwidth (Kbps)",
         legendPosition: "middle", // Center the legend on the axis
         legendOffset: -55, // Use a negative value to move the title closer to the Y-axis
         tick: ({ x, y, formattedValue }) => (

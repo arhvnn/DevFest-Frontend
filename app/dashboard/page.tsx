@@ -10,12 +10,21 @@ import avatar from "../../assets/avatar.png";
 import Image from 'next/image'; 
 import Charts from "../../components/dashboard/dashboardDetails";
 import NetworkTopology from "../../components/NetworkTopology/NetworkTopology";
-import ControlPanel from "../../components/control/ControlPanel"
+import ControlPanel from "../../components/control/ControlPanel";
+
 const Dashboard = () => {
     const [activeItem, setActiveItem] = useState('dashboard');
 
     const handleItemClick = (item: SetStateAction<string>) => {
         setActiveItem(item);
+    };
+
+    const handleLogout = () => {
+        const confirmLogout = window.confirm("Are you sure you want to logout?");
+        if (confirmLogout) {
+            localStorage.removeItem('authToken'); // Replace 'token' with the actual key you use
+            window.location.href = 'http://localhost:3000/'; // Redirect to the home page
+        }
     };
 
     return (
@@ -56,16 +65,21 @@ const Dashboard = () => {
                         Control
                     </div>
                     <div className={styles.adminSection}>
-                        <span className={styles.icon}>
-                            <Image src={avatar} alt="Admin Avatar" width={40} height={40} />
-                        </span>
-                        <span className={styles.adminName}>Admin Name</span>
+                        <div className={styles.divhakkbrk}>
+                            <span className={styles.icon}>
+                                <Image src={avatar} alt="Admin Avatar" width={40} height={40} />
+                            </span>
+                            <span className={styles.adminName}>admin_user</span>
+                        </div>
+                        <div className={styles.logout}>
+                            <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
+                        </div>
                     </div>
                 </div>
                 <div className={styles.mainContent}>
                     {activeItem === 'dashboard' && <Charts />}
                     {activeItem === 'network' && <NetworkTopology />}
-                    {activeItem === 'control' && <ControlPanel/>}
+                    {activeItem === 'control' && <ControlPanel />}
                     {activeItem === '' && <div>Select an option from the sidebar</div>} {/* Optional message when no item is selected */}
                 </div>
             </div>

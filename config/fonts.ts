@@ -1,6 +1,7 @@
 import { Fira_Code as FontMono, Inter as FontSans } from "next/font/google";
 import '@fontsource/poppins'; 
 
+
 export const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -23,3 +24,4 @@ export const applyFontPoppins = `
     --font-poppins: ${fontPoppins.fontFamily};
   }
 `;
+
