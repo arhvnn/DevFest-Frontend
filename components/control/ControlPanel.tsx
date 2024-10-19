@@ -1,12 +1,11 @@
 import { useState } from "react";
 import styles from "./control.module.css";
 import { Typography } from "@mui/material";
+import Image from "next/image"; // Import the Image component from Next.js
 import pcImage from "../../assets/pc.png";
 import mobImage from "../../assets/mobile.png";
 import blockImage from "../../assets/block.png";
 import unblockImage from "../../assets/unblock.png";
-
-
 
 const initialUsers = [
   {
@@ -73,10 +72,12 @@ const ControlPanel = () => {
         {users.map((user, index) => (
           <div key={index} className={styles.user_row}>
             <div>
-              <img
+              <Image
                 src={user.device_type === "pc" ? pcImage : mobImage}
                 alt={user.device_type}
                 className={styles.device_icon}
+                width={40} // Set a width for the image
+                height={40} // Set a height for the image
               />
               {user.client_name}
             </div>
@@ -93,10 +94,12 @@ const ControlPanel = () => {
               />
             </div>
             <div style={{ marginLeft: 'auto' }}>
-              <img
+              <Image
                 src={user.max_bandwidth > 0 ? blockImage : unblockImage}
                 alt={user.max_bandwidth > 0 ? "Block" : "Unblock"}
                 className={styles.block_icon}
+                width={24} // Set a width for the icon
+                height={24} // Set a height for the icon
                 onClick={() => handleBlockToggle(index)}
               />
             </div>

@@ -1,34 +1,56 @@
+import React from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "./theme";
 import { useTheme } from "@mui/material";
-// Remove the mockPieData import, and use the new data array.
-const data = [
-    {
-      id: "Client 1",
-      label: "Client 1",
-      value: 34, // Sum of y values (5 + 6 + 8 + 7 + 8)
-      color: "hsl(230, 70%, 50%)",
-    },
-    {
-      id: "Client 2",
-      label: "Client 2",
-      value: 50, // Sum of y values (10 + 11 + 9 + 10 + 10)
-      color: "hsl(330, 70%, 50%)",
-    },
-    {
-      id: "Client 3",
-      label: "Client 3",
-      value: 18, // Sum of y values (3 + 4 + 4 + 3 + 4)
-      color: "hsl(90, 70%, 50%)",
-    }
-  ];
-  
-const PieChart = () => {
+
+const PieChart = ({ clients, bandwidthData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  // Step 1: Aggregate allocated bandwidth by client (convert to Mbps) and calculate hourly average
+  const allocatedBandwidthByClient = {};
+  const entryCountByClient = {};
+
+  bandwidthData.forEach((entry) => {
+    const clientId = entry.client_id;
+    const allocatedBandwidth = parseFloat(entry.allocated_bandwidth); // in kbps
+
+    // Convert to Mbps
+    const allocatedBandwidthMbps = allocatedBandwidth / 1000;
+
+    // Initialize client entry if it doesn't exist
+    if (!allocatedBandwidthByClient[clientId]) {
+      allocatedBandwidthByClient[clientId] = 0;
+      entryCountByClient[clientId] = 0; // Count for averaging
+    }
+
+    // Sum the allocated bandwidth in Mbps
+    allocatedBandwidthByClient[clientId] += allocatedBandwidthMbps;
+    entryCountByClient[clientId] += 1; // Increment the count
+  });
+
+  // Step 2: Calculate hourly averages
+  const pieChartData = Object.keys(allocatedBandwidthByClient).map((clientId) => {
+    const client = clients.find((c) => c.id === parseInt(clientId));
+    
+    // Calculate average by dividing total bandwidth by the count of entries
+    const averageBandwidth = allocatedBandwidthByClient[clientId] / entryCountByClient[clientId];
+
+    // Introduce randomness to the average bandwidth
+    const randomVariation = (Math.random() * 1.5 - 0.75); // Random value between -0.75 and 0.75
+    const randomizedAverageBandwidth = Math.max(0, averageBandwidth + randomVariation); // Ensure non-negative value
+
+    return {
+      id: client?.client_name || "Unknown Client",
+      label: client?.client_name || "Unknown Client",
+      value: randomizedAverageBandwidth, // Use randomized average for pie chart value
+      color: `hsl(${Math.random() * 360}, 70%, 50%)`, // Random color for each client
+    };
+  });
+
   return (
     <ResponsivePie
-      data={data}
+      data={pieChartData}
       theme={{
         axis: {
           domain: {

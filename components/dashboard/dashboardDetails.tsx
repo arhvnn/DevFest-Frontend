@@ -27,21 +27,19 @@ const Dashboard: React.FC = () => {
         })
       ]);
 
-      console.log("Bandwidth Response:", bandwidthResponse.data);
       setBandwidthData(bandwidthResponse.data);
-
-      console.log("Clients Response:", clientsResponse.data);
       setClientsData(clientsResponse.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+  // Fetch data only once on component mount
   useEffect(() => {
     fetchData(); // Initial data fetch
-    const intervalId = setInterval(fetchData, 1000); // Fetch data every second
+    // const intervalId = setInterval(fetchData, 1000); // Fetch data every second
 
-    return () => clearInterval(intervalId); // Clear the interval on component unmount
+    // return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
 
   // Stop calculating total bandwidth for now
@@ -52,9 +50,6 @@ const Dashboard: React.FC = () => {
     }, 0);
     setTotalBandwidthKbps(totalKbps);
     setTotalBandwidthMbps(totalKbps / 1000); // Convert to Mbps
-
-    console.log("Total Allocated Bandwidth (kbps):", totalKbps);
-    console.log("Total Allocated Bandwidth (Mbps):", totalKbps / 1000);
   }, [bandwidthData]);
   */
 
@@ -94,7 +89,15 @@ const Dashboard: React.FC = () => {
               </div>
             </header>
             <div style={{ height: "270px", margin: "-20px 0 0 0" }}>
-              <LineChart data={bandwidthData} labels={userNames} isDashboard={true} />
+              <LineChart 
+                clients={userNames} 
+                clientsData={clientsData} 
+                bandwidthclients={userNames} 
+                clientsData={clientsData} 
+                bandwidthData={bandwidthData} 
+                isDashboard={true}  
+                isDashboard={true} 
+              />
             </div>
           </section>
 
@@ -122,14 +125,20 @@ const Dashboard: React.FC = () => {
           <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400], padding: "30px" }}>
             <Typography variant="h5" fontWeight="600">Pie Chart</Typography>
             <div style={{ height: "200px", marginTop: "25px" }}>
-              <PieChart data={bandwidthData} isDashboard={true} />
+              <PieChart
+                clients={clientsData} 
+                bandwidthData={bandwidthData} 
+                 />
             </div>
           </section>
 
           <section style={{ gridColumn: "span 4", gridRow: "span 2", backgroundColor: colors.primary[400] }}>
             <Typography variant="h5" fontWeight="600" sx={{ padding: "30px 30px 0 30px" }}>Bar Chart</Typography>
             <div style={{ height: "250px", marginTop: "-20px" }}>
-              <BarChart data={bandwidthData} isDashboard={true} />
+              <BarChart clients={userNames} 
+                clientsData={clientsData} 
+                bandwidthData={bandwidthData} 
+                isDashboard={true}  isDashboard={true} />
             </div>
           </section>
         </div>
